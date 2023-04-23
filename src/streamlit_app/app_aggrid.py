@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os 
 
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -14,6 +15,16 @@ def get_article_manager():
 
 # Streamlit App
 st.set_page_config(page_title="Article Search", layout="wide")
+
+if os.environ.get('HIDE_MENU', 'true') == 'true':
+        st.markdown("""
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """, unsafe_allow_html=True)
+
+
 st.title("Article Search")
 
 article_manager = get_article_manager()
