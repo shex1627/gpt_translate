@@ -6,7 +6,7 @@ from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid import GridUpdateMode, DataReturnMode
 from gpt_translate.articles.JsonArticleManager import JsonArticleManager
-
+from gpt_translate.streamlit_util import extract_url_parameters
 
 @st.cache_data
 def get_article_manager():
@@ -46,6 +46,8 @@ if 'selected_article' not in st.session_state:
     st.session_state.selected_article = None
 
 st.header("Search Articles")
+query_params = st.experimental_get_query_params()
+print(query_params)
 
 # Input & options
 search_input = st.text_input("Search Articles", max_chars=30)
@@ -63,12 +65,13 @@ if st.button("Search"):
     st.session_state.results = results
 
 
-if st.session_state.results.shape[0] > 0:
+selected_rows = []
+
+if st.session_state.get("results", pd.DataFrame()).shape[0] > 0:
     # Generate column definitions dynamically
     gb = GridOptionsBuilder.from_dataframe(st.session_state.results[show_cols])
     gb.configure_selection(use_checkbox=True)
     gridOptions = gb.build()
-    print(f"rendering {st.session_state.results.shape}")
     grid_response = AgGrid(
         dataframe=st.session_state.results[show_cols],
         gridOptions = gridOptions,
@@ -78,14 +81,30 @@ if st.session_state.results.shape[0] > 0:
 
     print(grid_response['selected_rows'])
     selected_rows = grid_response['selected_rows']
-    if len(selected_rows) > 0:
-        st.header("Read Article")
-        st.write(pd.DataFrame(selected_rows))
 
-        st.session_state.selected_article = st.session_state.results.query(f"title == '{selected_rows[0]['title']}'").to_dict('records')[0]
-        if st.session_state.language == "English":
-            st.write(st.session_state.selected_article['translation'])
-        else:
-            st.write(st.session_state.selected_article['text'])
-
+if query_params.get('article_id', []):
+    query_param_article = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}")
+    if query_param_article.shape[0] > 0:
+        #st.session_state.results = query_param_article
+        query_selected_rows = query_param_article[show_cols].to_dict('records')
+    else:
+        query_selected_rows = []
+    
+if len(selected_rows) > 0:
+    st.header("Read Article")
+    st.write(pd.DataFrame(selected_rows))
+    st.session_state.selected_article = st.session_state.results.query(f"title == '{selected_rows[0]['title']}'").to_dict('records')[0]
+    if st.session_state.language == "English":
+        st.write(st.session_state.selected_article['translation'])
+    else:
+        st.write(st.session_state.selected_article['text'])
+elif len(query_selected_rows) > 0:
+    st.header("Read Article")
+    query_params_article_df = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}")
+    st.write(pd.DataFrame(query_params_article_df[show_cols]))
+    st.session_state.selected_article = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}").to_dict('records')[0]
+    if st.session_state.language == "English":
+        st.write(st.session_state.selected_article['translation'])
+    else:
+        st.write(st.session_state.selected_article['text'])
 
