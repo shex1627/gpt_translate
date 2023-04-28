@@ -97,6 +97,8 @@ if len(selected_rows) > 0:
         st.write(st.session_state.selected_article['translation'])
     else:
         st.write(st.session_state.selected_article['text'])
+    st.experimental_set_query_params(article_id=st.session_state.selected_article['id'])
+    
 elif len(query_selected_rows) > 0:
     st.header("Read Article")
     query_params_article_df = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}")
