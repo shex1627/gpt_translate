@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import os 
+from urllib.request import urlopen
+from PIL import Image
+
 
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -12,8 +15,12 @@ def get_article_manager():
    article_manager = JsonArticleManager("C:\\Users\\alistar\\Desktop\\ds\\blogger_translate\\articles_embedding.json")
    return article_manager
 
+
+page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+
 # Streamlit App
-st.set_page_config(page_title="Article Search", layout="wide")
+st.set_page_config(page_title="Article Search", 
+                   page_icon=page_icon, layout="wide")
 
 if os.environ.get('HIDE_MENU', 'true') == 'true':
         st.markdown("""
