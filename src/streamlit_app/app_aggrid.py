@@ -6,7 +6,6 @@ from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid import GridUpdateMode, DataReturnMode
 from gpt_translate.articles.JsonArticleManager import JsonArticleManager
-from gpt_translate.streamlit_util import extract_url_parameters
 
 @st.cache_data
 def get_article_manager():
@@ -82,13 +81,13 @@ if st.session_state.get("results", pd.DataFrame()).shape[0] > 0:
     print(grid_response['selected_rows'])
     selected_rows = grid_response['selected_rows']
 
+query_selected_rows = []
 if query_params.get('article_id', []):
     query_param_article = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}")
     if query_param_article.shape[0] > 0:
         #st.session_state.results = query_param_article
         query_selected_rows = query_param_article[show_cols].to_dict('records')
-    else:
-        query_selected_rows = []
+        
     
 if len(selected_rows) > 0:
     st.header("Read Article")
