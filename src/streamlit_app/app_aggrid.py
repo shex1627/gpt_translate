@@ -38,7 +38,7 @@ article_manager = get_article_manager()
 language = st.radio("Language:", ["English", "Chinese"], index=0)
 st.session_state.language = language
 if st.session_state.language == 'English':
-    show_cols = ['title', 'english_main_topic', 'english_tags']
+    show_cols = ['english_title', 'english_main_topic', 'english_tags', 'title']
 else:
     show_cols = ['title', 'chinese_main_topic', 'chinese_tags']
 
