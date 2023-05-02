@@ -1,11 +1,14 @@
 import json
 import pandas as pd
 import numpy as np
+from typing import Dict
 from sklearn.metrics.pairwise import cosine_similarity
 
 from gpt_translate.articles.dto import * 
 from gpt_translate.articles.ArticleManager import  ArticleManager
+from gpt_translate.article_to_translation import process_article, translate_article
 from gpt_translate.utils import load_json_files
+from gpt_translate.prompts import translator_prompt, translate_title_prompt, tags_prompt_prob_with_main_eng_title
 
 import logging
 logger = logging.getLogger("JsonArticleManager")
@@ -15,6 +18,7 @@ class JsonArticleManager(ArticleManager):
         #articles_json = load_json_files(json_data_path)
         self.articles_df = pd.read_json(articles_json_path, orient="records")
         self.tags_count = self.__count_tags__()
+        self.article_json_path = articles_json_path
 
     def search_by_tags(self, input_tag: str, top_n= 15):
         # Filter the DataFrame to include only rows with the specified tag
@@ -93,3 +97,102 @@ class JsonArticleManager(ArticleManager):
     
     def get_tags_count(self):
         return self.tags_count
+
+    def add_complete_article(self, article_record :Dict):
+        """
+        add article to current existing articles, persist
+
+        article should be a dictionary or pydantic model with following fields minimum:
+        title
+        english_title
+        english_tags
+        chinese_tags
+        text
+        translation
+        embedding (15XX dim dimensions)
+
+        article should have column ID which should be unique
+        """
+        #
+        article_record = article_record.copy()
+        expected_columns = ['title', 'english_title', 'english_tags', 'chinese_tags', 'text', 'translation', 'embedding']
+            # Make sure the dictionary has all the expected columns
+        if not set(expected_columns).issubset(article_record.keys()):
+            raise ValueError(f"Dictionary is missing expected columns. Missing： {set(expected_columns).difference(set(article_record.keys()))}")
+        
+        # Remove any extra attributes from the dictionary
+        article_record['id'] = int(self.articles_df['id'].max() + 1)
+        article_record = {k: v for k, v in article_record.items() if k in self.articles_df.columns}
+        
+        # Create a Series from the dictionary with missing columns filled with np.nan
+        series = pd.Series(article_record, index=list(article_record.keys()))
+        
+        # Append the series to the DataFrame
+        self.articles_df = self.articles_df.append(series, ignore_index=True)
+
+        # persist dictionary to db
+        self.articles_df.to_json(self.article_json_path, orient='records')
+        return self.articles_df
+    
+
+    def complete_article(self, record :Dict, completion_config: Dict):
+        """
+        [not modify DB]
+        given an article with only
+        title
+        text,
+
+        return a dictionary s.t
+        english_title
+        translation
+        english_title
+        english_tags
+        chinese_tags
+        """
+        record = record.copy()
+        expected_columns = ['title', 'text']
+            # Make sure the dictionary has all the expected columns
+        if not set(expected_columns).issubset(record.keys()):
+            raise ValueError(f"Dictionary is missing expected columns. Missing： {set(expected_columns).difference(set(record.keys()))}")
+        
+        # find enligsh title 
+        english_title = process_article(record['title'],100000,
+                                completion_config, translate_title_prompt)
+        record['english_title'] = english_title.replace("\"", "")
+
+        # find english translation
+        article_translation = translate_article(record['text'], completion_config, translator_prompt)
+        record['translation'] = article_translation
+        
+        # find english tags 
+        article_tags = process_article(record['translation'],100000,
+                                completion_config, tags_prompt_prob_with_main_eng_title)
+        article_tags_dict = json.loads(article_tags)
+        record.update(article_tags_dict)
+        
+        # create tags 
+        record['pre_embed_tokens'] = self.preprocess_tags(
+        [record['english_main_topic']] + list(record['english_tags'].keys()) 
+        )
+        
+        embedding = self.get_embedding(record['pre_embed_tokens'])
+        record['embedding'] = embedding
+        return record
+    
+
+    def add_tag(self, article_id: int):
+        """
+        [modify DB]
+        add english or chinese tags to an article
+        """
+        raise NotImplementedError()
+    
+
+
+    def remove_article_by_id(self, id: str):
+        # Filter the DataFrame to exclude rows with the specified ID value
+        self.articles_df = self.articles_df[self.articles_df['id'] != id]
+
+        # persist dictionary to db
+        self.articles_df.to_json(self.article_json_path, orient='records')
+        return self.articles_df

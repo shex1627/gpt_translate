@@ -5,6 +5,7 @@ import logging
 
 import openai
 from tqdm import tqdm
+
 logger = logging.getLogger("article translation util")
 
 def text_split(text: str, max_length = 1024) -> List[str]:
@@ -37,19 +38,6 @@ def text_split(text: str, max_length = 1024) -> List[str]:
 
     # Return the list of segments
     return segments
-
-
-def translator_prompt(text: str, token_limit: int= 1500):
-    """
-    generate messages
-    """
-    messages = [
-      {"role": "system", "content": "You are a helpful assistant that translates Chinese to English."},
-      {"role": "user", "content": f'Translate the following Chinese to English,add new paragraphs for better readability: {text}"'}
-    ]
-    #num_tokens = num_tokens_from_messages(messages)
-    #print(f"num_tokens {num_tokens}")
-    return messages
 
 def combine_openapi_response(response):
     """

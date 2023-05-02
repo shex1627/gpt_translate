@@ -1,3 +1,16 @@
+def translator_prompt(text: str, token_limit: int= 1500):
+    """
+    generate messages
+    """
+    messages = [
+      {"role": "system", "content": "You are a helpful assistant that translates Chinese to English."},
+      {"role": "user", "content": f'Translate the following Chinese to English,add new paragraphs for better readability: {text}"'}
+    ]
+    #num_tokens = num_tokens_from_messages(messages)
+    #print(f"num_tokens {num_tokens}")
+    return messages
+
+
 def tags_prompt_prob_with_main(text: str):
     """
     find main topics of a translation with tags in both English and Chinese
