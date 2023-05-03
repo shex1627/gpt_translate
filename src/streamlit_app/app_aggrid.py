@@ -104,7 +104,7 @@ if len(selected_rows) > 0:
     if st.session_state.language == "English":
         st.write(st.session_state.selected_article['translation'])
     else:
-        st.write(st.session_state.selected_article['text'])
+        st.code(st.session_state.selected_article['text'])
     st.experimental_set_query_params(article_id=st.session_state.selected_article['id'])
     
 elif len(query_selected_rows) > 0:
@@ -116,5 +116,5 @@ elif len(query_selected_rows) > 0:
     if st.session_state.language == "English":
         st.write(st.session_state.selected_article['translation'])
     else:
-        st.write(st.session_state.selected_article['text'])
+        st.code(st.session_state.selected_article['text'])
 
