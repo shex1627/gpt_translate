@@ -100,6 +100,7 @@ if len(selected_rows) > 0:
     st.header("Read Article")
     st.write(pd.DataFrame(selected_rows))
     st.session_state.selected_article = st.session_state.results.query(f"title == '{selected_rows[0]['title']}'").to_dict('records')[0]
+    print(st.session_state.selected_article['title'])
     if st.session_state.language == "English":
         st.write(st.session_state.selected_article['translation'])
     else:
@@ -111,6 +112,7 @@ elif len(query_selected_rows) > 0:
     query_params_article_df = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}")
     st.write(pd.DataFrame(query_params_article_df[show_cols]))
     st.session_state.selected_article = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}").to_dict('records')[0]
+    print(st.session_state.selected_article['title'])
     if st.session_state.language == "English":
         st.write(st.session_state.selected_article['translation'])
     else:
