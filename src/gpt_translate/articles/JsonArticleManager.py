@@ -36,7 +36,7 @@ class JsonArticleManager(ArticleManager):
         return sorted_rows.head(top_n)
     
     def search_by_embedding(self, input_str: str, top_n= 15):
-        input_embedding = ArticleManager.get_embedding(input_str)
+        input_embedding = self.get_embedding(input_str)
 
         # Calculate cosine similarity between the input embedding and all embeddings in the dataframe
         embeddings = np.stack(self.articles_df['embedding'].to_numpy())
