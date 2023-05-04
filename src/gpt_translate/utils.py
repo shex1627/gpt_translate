@@ -24,3 +24,50 @@ def load_json_files(file_path: str) -> List[Dict]:
                 data_list.append(data)
 
     return data_list
+
+
+def add_newline_after_period(chinese_article: str) -> str:
+    """
+    Takes a Chinese article as input and returns the same article with a newline added
+    after each period, but only if there is no newline character already present.
+
+    Args:
+        chinese_article: A string containing a Chinese article.
+
+    Returns:
+        A string containing the input article with a newline added after each period,
+        but only if there is no newline character already present.
+
+    Example:
+        >>> article = "这是一篇关于Python的文章。Python是一种高级编程语言。"
+        >>> add_newline_after_period(article)
+        '这是一篇关于Python的文章。\nPython是一种高级编程语言。'
+    """
+    new_article = ""
+    for i in range(len(chinese_article)):
+        if chinese_article[i] == "。" and i < len(chinese_article) - 1 and chinese_article[i+1] != "\n":
+            new_article += "。\n"
+        else:
+            new_article += chinese_article[i]
+    return new_article
+
+def add_newlines(article: str) -> str:
+    """
+    Adds a newline character after each period (`。`) in a Chinese article, but only if there are no existing newline characters.
+
+    Args:
+        article (str): The Chinese article to process.
+
+    Returns:
+        str: The processed Chinese article with a newline character after each period (`。`).
+    """
+    if '\n' in article:
+        return article
+    
+    new_article = ''
+    for char in article:
+        new_article += char
+        if char == '。':
+            new_article += '\n'
+    
+    return new_article

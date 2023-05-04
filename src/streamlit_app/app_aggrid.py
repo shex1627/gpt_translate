@@ -3,32 +3,12 @@ import pandas as pd
 import os 
 from urllib.request import urlopen
 from PIL import Image
-from gtts import gTTS
-from io import BytesIO
-from IPython.display import Audio
-
-def text_to_audio(text, lang = 'en'):
-    # Create gTTS object with text
-    tts = gTTS(text, lang = lang)
-
-    # Create in-memory file object
-    fp = BytesIO()
-    
-    # Save audio to file object
-    tts.write_to_fp(fp)
-    
-    # Seek to beginning of file object
-    fp.seek(0)
-    
-    # Return audio file object
-    return fp
-
-
 
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid import GridUpdateMode, DataReturnMode
 from gpt_translate.articles.JsonArticleManager import JsonArticleManager
+from gpt_translate.utils import add_newlines
 
 @st.cache_data
 def get_article_manager():
@@ -54,6 +34,8 @@ if os.environ.get('HIDE_MENU', 'true') == 'true':
 st.title("Article Search")
 
 article_manager = get_article_manager()
+query_params = st.experimental_get_query_params()
+print(query_params)
 
 language = st.radio("Language:", ["English", "Chinese"], index=0)
 st.session_state.language = language
@@ -72,8 +54,6 @@ if 'selected_article' not in st.session_state:
     st.session_state.selected_article = None
 
 st.header("Search Articles")
-query_params = st.experimental_get_query_params()
-print(query_params)
 
 # Input & options
 search_input = st.text_input("Search Articles", max_chars=30)
@@ -122,23 +102,9 @@ if len(selected_rows) > 0:
     st.session_state.selected_article = st.session_state.results.query(f"title == '{selected_rows[0]['title']}'").to_dict('records')[0]
     print(st.session_state.selected_article['title'])
     if st.session_state.language == "English":
-        # Create "Convert to Speech" button
-        if st.button("Convert to Speech [takes few minutes]"):
-            # Convert text to audio
-            audio_file = text_to_audio(st.session_state.selected_article['translation'])
-            
-            # Play audio
-            st.audio(audio_file, format="audio/mp3")
         st.write(st.session_state.selected_article['translation'])
     else:
-        # Create "Convert to Speech" button
-        if st.button("Convert to Speech [takes few minutes]"):
-            # Convert text to audio
-            audio_file = text_to_audio(st.session_state.selected_article['text'], lang='zh-CN')
-            
-            # Play audio
-            st.audio(audio_file, format="audio/mp3")
-        st.code(st.session_state.selected_article['text'])
+        st.code(add_newlines(st.session_state.selected_article['text'].strip()))
     st.experimental_set_query_params(article_id=st.session_state.selected_article['id'])
     
 elif len(query_selected_rows) > 0:
@@ -148,22 +114,8 @@ elif len(query_selected_rows) > 0:
     st.session_state.selected_article = article_manager.articles_df.query(f"id == {int(query_params.get('article_id')[0])}").to_dict('records')[0]
     print(st.session_state.selected_article['title'])
     if st.session_state.language == "English":
-        # Create "Convert to Speech" button
-        if st.button("Convert to Speech [takes few minutes]"):
-            # Convert text to audio
-            audio_file = text_to_audio(st.session_state.selected_article['translation'])
-            
-            # Play audio
-            st.audio(audio_file, format="audio/mp3")
         st.write(st.session_state.selected_article['translation'])
     else:
-        # Create "Convert to Speech" button
-        if st.button("Convert to Speech [takes few minutes]"):
-            # Convert text to audio
-            audio_file = text_to_audio(st.session_state.selected_article['text'], lang='zh-CN')
-            
-            # Play audio
-            st.audio(audio_file, format="audio/mp3")
-        st.code(st.session_state.selected_article['text'])
+        st.code(add_newlines(st.session_state.selected_article['text'].strip()))
         
 
