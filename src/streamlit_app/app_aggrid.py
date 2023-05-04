@@ -59,7 +59,7 @@ st.header("Search Articles")
 search_input = st.text_input("Search Articles", max_chars=30)
 search_option = st.radio("Search by:", ["Embedding", "Tag", "Text"])
 
-if st.button("Search"):
+if st.button("Search") and search_input:
     if search_option == "Embedding":
         results = article_manager.search_by_embedding(search_input)
     elif search_option == "Tag":
