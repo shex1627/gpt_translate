@@ -60,7 +60,7 @@ class JsonArticleManager(ArticleManager):
             return pd.DataFrame(columns=['title', 'embedding', 'text', 'translation', 'date'])
 
         # Sort the query results by date in descending order
-        query_results = query_results.sort_values(by='date', ascending=False)
+        #query_results = query_results.sort_values(by='date', ascending=False)
 
         #     # Calculate cosine similarity between the query embeddings and all embeddings in the dataframe
         #     query_embeddings = np.stack(query_results['embedding'].to_numpy())
