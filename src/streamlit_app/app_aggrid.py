@@ -12,7 +12,7 @@ from gpt_translate.utils import add_newlines
 
 @st.cache_data
 def get_article_manager():
-   article_manager = JsonArticleManager("C:\\Users\\alistar\\Desktop\\ds\\blogger_translate\\articles_embedding.json")
+   article_manager = JsonArticleManager(os.environ.get('ARTICLE_DB_PATH', '"C:\\Users\\alistar\\Desktop\\ds\\blogger_translate\\articles_embedding.json"'))
    return article_manager
 
 
