@@ -1,0 +1,12 @@
+[Unit]
+Description=gpt-translate
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/shichenh/miniconda3/envs/gpt_translate/bin/python run -m streamlit run app_aggrid.py
+WorkingDirectory=/opt/shichenh/gpt_translate/src/streamlit_app
+User=shichenh
+
+[Install]
+WantedBy=default.target
