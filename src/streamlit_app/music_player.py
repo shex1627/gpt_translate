@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 import random
+from urllib.request import urlopen
+from PIL import Image
 from pydub import AudioSegment
 
 music_folder = os.environ.get("AUDIO_DIRECTORY", "C:\\Users\\alistar\\Desktop\\ds\\blogger_translate\\tts\\tts_data")
@@ -42,7 +44,19 @@ def create_playlist(language, playlist_size, cn_audio_files, en_audio_files):
     return output_path
 
 def main():
+    
+    page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+    st.set_page_config(page_title="Audiobook", 
+                   page_icon=page_icon)
     st.title("Audiobook Player")
+    
+    if os.environ.get('HIDE_MENU', 'true') == 'true':
+            st.markdown("""
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                </style>
+                """, unsafe_allow_html=True)
 
     # Retrieve query parameters
     query_params = st.experimental_get_query_params()
