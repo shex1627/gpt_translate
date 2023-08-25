@@ -1,6 +1,6 @@
 [Unit]
 Description=Cloudflared Tunnel
-After=network.target
+After=memory_streamlit.service
 
 [Service]
 Type=simple
