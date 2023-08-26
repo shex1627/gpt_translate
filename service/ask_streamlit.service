@@ -1,0 +1,12 @@
+[Unit]
+Description=gpt-translate
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/shichenh/miniconda3/envs/gpt_translate/bin/python -m streamlit run question.py --server.port 8504
+WorkingDirectory=/opt/shichenh/gpt_translate/src/streamlit_app
+EnvironmentFile=/opt/shichenh/gpt_translate/service/memory.env
+
+[Install]
+WantedBy=default.target
