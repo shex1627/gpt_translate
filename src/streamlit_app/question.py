@@ -74,11 +74,11 @@ def agggregate_article_summary(article_summaries: str, question: str, language: 
     return sentences
 
 # set up page icon
-#page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
 
 # Streamlit App
 st.set_page_config(page_title="Article Search", 
-                   #page_icon=page_icon, 
+                   page_icon=page_icon, 
                    layout="wide")
 
 # hide menu
@@ -91,13 +91,13 @@ if os.environ.get('HIDE_MENU', 'true') == 'true':
             """, unsafe_allow_html=True)
         
 st.title("Answer Questions from Articles")
-st.write("This website uses GPT-3 to answer questions based on the top 5 relevant articles from a wechat blog. The blog covers a wide range of common topics in life.")
+st.write("This website uses GPT to answer questions based on the top 5 relevant articles from a wechat blog. The blog covers a wide range of common topics in life.")
 
 article_manager = get_article_manager()
 query_params = st.experimental_get_query_params()
 language = st.radio("Language:", ["English", "Chinese"], index=0)
 is_random = st.radio("Article Randomness", ["Default", "Random"], index=0)
-st.write("Note: Random means randomly choose 5 out of top 20 relevant articles")
+st.write("Note: Random means randomly choose 5 out of top 30 relevant articles")
 
 # save random to session state
 st.session_state.is_random = is_random
@@ -120,7 +120,7 @@ question = st.text_input("question prompt", max_chars=30)
 if st.button("Ask") and question:
     key_context_resp = openai.ChatCompletion.create(**completion_config, messages=key_context_prompt(question))
     key_context = key_context_resp.choices[0]['message']['content'].replace("作者,", "")
-    relevant_articles = article_manager.search_by_embedding(key_context) 
+    relevant_articles = article_manager.search_by_embedding(key_context, top_n=30) 
     if st.session_state.is_random == "Default":
         seed = "None"
         st.session_state.seed = seed
@@ -132,6 +132,7 @@ if st.button("Ask") and question:
     results['article_url'] = results['id'].apply(lambda x: f"https://memory.ftdalpha.com?article_id={x}")
     results = results.reset_index(drop=True)
     st.session_state.results = results
+st.write("Note: typical run takes 2-4 min to finish")
 
 if st.session_state.get("results", pd.DataFrame()).shape[0] > 0:
     # Generate column definitions dynamically
