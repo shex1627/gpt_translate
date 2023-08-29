@@ -118,9 +118,10 @@ records = new_articles_df.to_dict("records")
 logger.info("running the translation pipeline")
 openai.api_key = os.environ["OPENAI_API_KEY"]
 completion_config = {
-    'model': "gpt-4",
+    'model': "gpt-3.5-turbo-16k",
     'temperature': 0
 }
+
 
 for record in records[1:]:
     try:

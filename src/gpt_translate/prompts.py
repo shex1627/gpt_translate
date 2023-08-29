@@ -62,7 +62,7 @@ def key_context_prompt(question: str):
     """
     messages = [
       {"role": "system", "content": "You are a QA bot that finds relevant information to answer the given question."},
-      {"role": "user", "content": f'extract key entities from below question "{question}", return only the list of key entities as plain text"'}
+      {"role": "user", "content": f'extract the key topics from below question "{question}", return only the list of key topics as plain text, do not include original question in the answer or any other information"'}
     ]
     #num_tokens = num_tokens_from_messages(messages)
     #print(f"num_tokens {num_tokens}")
