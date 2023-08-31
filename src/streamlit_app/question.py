@@ -108,7 +108,8 @@ if 'selected_article' not in st.session_state:
     st.session_state.selected_article = None
 
 st.header("Ask A Question")
-question = st.text_input("question prompt",value=initial_question, max_chars=30)
+question = st.text_input("question prompt",value=initial_question, max_chars=60)
+st.experimental_set_query_params(question=question, language=st.session_state.language)
 
 if (st.button("Ask") and question) or auto_run:
     key_context_resp = openai.ChatCompletion.create(**completion_config, messages=key_context_prompt(question))
