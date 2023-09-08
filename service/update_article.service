@@ -1,0 +1,12 @@
+[Unit]
+Description=gpt-translate
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/shichenh/miniconda3/envs/gpt_translate/bin/python cron_script.py /opt/shichenh/gpt_translate/src/gpt_translate/crawl/article_update.py  --interval 21600 --services memory_streamlit.service ask_streamlit.service
+WorkingDirectory=/opt/shichenh/gpt_translate/src/gpt_translate/crawl
+EnvironmentFile=/opt/shichenh/gpt_translate/service/update_article.env
+
+[Install]
+WantedBy=default.target

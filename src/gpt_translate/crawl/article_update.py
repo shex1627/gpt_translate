@@ -123,7 +123,7 @@ completion_config = {
 }
 
 
-for record in records[1:]:
+for record in records:
     try:
         if record['text']:
             logger.info(f"processing record: {record['title']}")
