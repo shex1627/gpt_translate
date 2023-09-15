@@ -8,15 +8,12 @@ def configure_logging(level):
     logging.basicConfig(level=level, format=log_format)
 
 def run_script(script_path, interval, python_exe: str="/opt/shichenh/miniconda3/envs/gpt_translate/bin/python"):
-    while True:
-        logging.info(f"Running script {script_path}")
-        try:
-            subprocess.run([python_exe, script_path])
-        except Exception as e:
-            logging.error(f"Failed to run script {script_path}: {e}")
-        
-        logging.info(f"Sleeping for {interval} seconds")
-        time.sleep(interval)
+    logging.info(f"Running script {script_path}")
+    try:
+        subprocess.run([python_exe, script_path])
+    except Exception as e:
+        logging.error(f"Failed to run script {script_path}: {e}")
+    
 
 def restart_service(service_names):
     for service in service_names:
@@ -37,7 +34,10 @@ if __name__ == "__main__":
 
     configure_logging(args.log_level)
     
-    if args.services:
-        restart_service(args.services)
-    
-    run_script(args.script_path, args.interval)
+    while True:
+        if args.services:
+            restart_service(args.services)
+        
+        run_script(args.script_path, args.interval)
+        logging.info(f"Sleeping for {args.interval} seconds")
+        time.sleep(args.interval)
