@@ -31,7 +31,7 @@ article_manager = JsonArticleManager(ARTICLE_JSON_PATH)
 
 
 #num_articles = ...  # Set the desired number of articles
-url = "https://c.m.163.com/news/sub/T1658526449605.html"
+url = "https://m.163.com/news/sub/T1658526449605.html"
 
 # Set up headless browser
 options = Options()
@@ -91,7 +91,7 @@ if new_articles_df.shape[0]:
 
             # Find all elements with the specified class
 
-            content_div = soup.find("div", class_="article-body")
+            content_div = soup.find("section", class_="article-body js-article-body")
             element_text = content_div.get_text()
             reformmated_text = element_text.replace("。", "\n")
             
