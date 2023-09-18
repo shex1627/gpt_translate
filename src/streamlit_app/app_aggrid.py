@@ -59,13 +59,17 @@ st.header("Search Articles")
 search_input = st.text_input("Search Articles", max_chars=30)
 search_option = st.radio("Search by:", ["Embedding", "Tag", "Text"])
 
+num_top_articles = int(query_params.get('top_k', [15])[0])
 if st.button("Search") and search_input:
     if search_option == "Embedding":
-        results = article_manager.search_by_embedding(search_input)
+        results = article_manager.search_by_embedding(search_input, num_top_articles).\
+        sort_values('id', ascending=False)
     elif search_option == "Tag":
-        results = article_manager.search_by_tags(search_input)
+        results = article_manager.search_by_tags(search_input, num_top_articles).\
+        sort_values('id', ascending=False)
     else:
-        results = article_manager.search_by_text(search_input)
+        results = article_manager.search_by_text(search_input, num_top_articles).\
+        sort_values('id', ascending=False)
 
     results = results.reset_index(drop=True)
     st.session_state.results = results
