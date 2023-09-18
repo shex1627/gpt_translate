@@ -22,9 +22,10 @@ logger.setLevel(logging.INFO)
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
-TOP_K_ARTICLES = 5
-SINGLE_ARTICLE_SUMMARY_LENGTH = 2048
-SUNMMARY_LENGTH = 4000
+TOP_K_ARTICLES = 10
+SINGLE_ARTICLE_SUMMARY_LENGTH = 1024
+SUNMMARY_LENGTH = 4000  
+TOP_N_ARTICLES = 40
 OUTPUT_FILE_PATH = os.environ.get("OUTPUT_FILE_PATH", "./output.json")
 
 completion_config = {
@@ -90,7 +91,7 @@ auto_run = bool(initial_question)
 languages = ["English", "Chinese"]
 language = st.radio("Language:", languages, index=languages.index(initial_language) if initial_language in languages else 0)
 is_random = st.radio("Article Randomness", ["Default", "Random"], index=0)
-st.write("Note: Random means randomly choose 5 out of top 30 relevant articles")
+st.write(f"Note: Random means randomly choose {TOP_K_ARTICLES} out of top {TOP_N_ARTICLES} relevant articles")
 
 # save random to session state
 st.session_state.is_random = is_random
@@ -114,7 +115,7 @@ st.experimental_set_query_params(question=question, language=st.session_state.la
 if (st.button("Ask") and question) or auto_run:
     key_context_resp = openai.ChatCompletion.create(**completion_config, messages=key_context_prompt(question))
     key_context = key_context_resp.choices[0]['message']['content'].replace("作者,", "")
-    relevant_articles = article_manager.search_by_embedding(key_context, top_n=30) 
+    relevant_articles = article_manager.search_by_embedding(key_context, top_n=TOP_N_ARTICLES) 
     if st.session_state.is_random == "Default":
         seed = "None"
         st.session_state.seed = seed

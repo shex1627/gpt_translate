@@ -7,6 +7,7 @@ import sys
 import openai
 import os
 import json
+import datetime
 
 from gpt_translate.articles.JsonArticleManager import JsonArticleManager
 from gpt_translate.crawl.util import extract_info, scroll_one_step
@@ -112,6 +113,8 @@ new_articles_df['text'] = new_articles_df['link'].apply(lambda url: "https://" +
          )
 
 new_articles_df.to_csv("./new_articles_df.csv", index=False)
+today_str = str(datetime.datetime.now().date())
+new_articles_df['date'] = today_str
 
 records = new_articles_df.to_dict("records")
 
