@@ -22,13 +22,13 @@ logger.setLevel(logging.INFO)
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
-TOP_K_ARTICLES = 10
-SINGLE_ARTICLE_SUMMARY_LENGTH = 1024
+TOP_K_ARTICLES = 5
+SINGLE_ARTICLE_SUMMARY_LENGTH = 2020
 SUNMMARY_LENGTH = 4000  
 TOP_N_ARTICLES = 40
 OUTPUT_FILE_PATH = os.environ.get("OUTPUT_FILE_PATH", "./output.json")
 
-completion_config = {
+gpt3_config = {
     'model': "gpt-3.5-turbo-16k",
     'temperature': 0
 }
@@ -37,6 +37,8 @@ gpt4_config = {
     'model': "gpt-4",
     'temperature': 0,
 }
+
+completion_config = gpt4_config
 
 @st.cache_data
 def get_article_manager():
