@@ -63,6 +63,13 @@ def learn_data_types_complex(data: Union[Dict[str, Any], List[Any]], print_outpu
     return result
 
 def print_dict_hierarchy(data: dict, indent: int = 0):
+    """
+    Recursively prints the hierarchy of a dictionary, including nested dictionaries and lists of dictionaries.
+
+    Args:
+        data (dict): The dictionary to print.
+        indent (int, optional): The number of spaces to indent each level of the hierarchy. Defaults to 0.
+    """
     for key, value in data.items():
         if isinstance(value, dict):
             print(f"{' '*indent}{key}:")

@@ -74,6 +74,11 @@ if st.button("Search") and search_input:
     results = results.reset_index(drop=True)
     st.session_state.results = results
 
+if st.button("Get Recent Articles"):
+    results = article_manager.get_recent_articles(num_top_articles).\
+        sort_values('id', ascending=False)
+    results = results.reset_index(drop=True)
+    st.session_state.results = results
 
 selected_rows = []
 

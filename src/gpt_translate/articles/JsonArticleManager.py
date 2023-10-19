@@ -196,3 +196,11 @@ class JsonArticleManager(ArticleManager):
         # persist dictionary to db
         self.articles_df.to_json(self.article_json_path, orient='records')
         return self.articles_df
+    
+
+    def get_recent_articles(self, top_n= 15):
+        # Sort the DataFrame by date in descending order
+        sorted_df = self.articles_df.sort_values(by='id', ascending=False)
+
+        # Return the top n most recent articles
+        return sorted_df.head(top_n)
