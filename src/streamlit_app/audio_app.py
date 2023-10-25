@@ -99,7 +99,7 @@ if st.session_state['playlist_id']:
     # check if playlist exists in playlist_manager.playlist_metadata
     logger.info(f"play articles section: playlist_id: {playlist_id}")
     metadata, audio_path = playlist_manager.load_playlist(st.session_state['playlist_id'])
-    st.write(f"### Playlist {playlist_id[0]}")
+    st.write(f"### Playlist {playlist_id}")
     st.write("Articles in this playlist:")
     current_playlist_articles = articles_df[articles_df['id'].isin(metadata['article_ids'])].reset_index(drop=True)
     preview_articles(current_playlist_articles, show_cols=['id']+show_cols)
