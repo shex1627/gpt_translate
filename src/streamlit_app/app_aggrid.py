@@ -16,7 +16,7 @@ def get_article_manager():
    return article_manager
 
 
-page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+page_icon = Image.open("./icon.jpg")
 
 # Streamlit App
 st.set_page_config(page_title="Article Search", 
