@@ -65,7 +65,7 @@ def agggregate_article_summary(article_summaries: str, question: str, language: 
     return response
 
 # set up page icon
-page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+page_icon = Image.open("./icon.jpg")
 
 # Streamlit App
 st.set_page_config(page_title="Article Search", 

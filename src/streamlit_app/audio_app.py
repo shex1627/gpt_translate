@@ -20,7 +20,7 @@ logging.basicConfig(
 
 logger = logging.getLogger()
 
-page_icon = Image.open(urlopen("https://i.imgur.com/z7ZGWvZ.jpg"))
+page_icon = Image.open("./icon.jpg")
 st.set_page_config(page_title="Audiobook", 
                 page_icon=page_icon)
 st.title("Audiobook Player")

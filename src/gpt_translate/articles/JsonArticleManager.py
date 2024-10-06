@@ -83,7 +83,11 @@ class JsonArticleManager(ArticleManager):
             lang_col = f"{lang.lower()}_tags"
             for row in self.articles_df.itertuples(index=False):
                 if row._asdict()[lang_col]:
-                    for tag, relevance in row._asdict()[lang_col].items():
+                    if isinstance(row._asdict()[lang_col], dict):
+                        tag_dict = row._asdict()[lang_col]
+                    elif isinstance(row._asdict()[lang_col], str):
+                        tag_dict = eval(row._asdict()[lang_col])
+                    for tag, relevance in tag_dict.items():
                         # Check if the tag is already in the tag_counts list
                         existing_tag = next((x for x in tag_counts if x['tag'] == tag and x['language'] == lang), None)
                         if existing_tag:
