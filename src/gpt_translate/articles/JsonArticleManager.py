@@ -20,20 +20,35 @@ class JsonArticleManager(ArticleManager):
         self.tags_count = self.__count_tags__()
         self.article_json_path = articles_json_path
 
-    def search_by_tags(self, input_tag: str, top_n= 15):
-        # Filter the DataFrame to include only rows with the specified tag
-        matching_rows = self.articles_df[
-            (self.articles_df['english_tags'].apply(lambda x: input_tag in x.keys())) | \
-            (self.articles_df['chinese_tags'].apply(lambda x: input_tag in x.keys()))].copy()
+    def search_by_tags(self, input_tag: str, top_n=15):
+        try:
+            # Ensure the input_tag is a string
+            if not isinstance(input_tag, str):
+                raise ValueError("The input_tag must be a string.")
 
-        # Sort the matching rows by relevance (if available) and then by date
-        if matching_rows.empty:
+            # Filter the DataFrame to include only rows with the specified tag
+            matching_rows = self.articles_df[
+                (self.articles_df['english_tags'].apply(lambda x: isinstance(x, dict) and input_tag in x.keys())) | \
+                (self.articles_df['chinese_tags'].apply(lambda x: isinstance(x, dict) and input_tag in x.keys()))
+            ].copy()
+
+            # If there are no matching rows, return an empty DataFrame
+            if matching_rows.empty:
+                return pd.DataFrame(columns=self.articles_df.columns)
+
+            # Calculate relevance and sort the matching rows by relevance and then by date
+            matching_rows['relevance'] = matching_rows.apply(
+                lambda row: row['english_tags'].get(input_tag, 0) + row['chinese_tags'].get(input_tag, 0), axis=1
+            )
+            sorted_rows = matching_rows.sort_values(by=['relevance', 'date'], ascending=[False, False]).drop(columns=['relevance'])
+
+            return sorted_rows.head(top_n)
+        except KeyError as e:
+            logger.error(f"KeyError: {e}")
             return pd.DataFrame(columns=self.articles_df.columns)
-
-        matching_rows['relevance'] = matching_rows.apply(lambda row: row['english_tags'].get(input_tag, 0) + row['chinese_tags'].get(input_tag, 0), axis=1)
-        sorted_rows = matching_rows.sort_values(by=['relevance', 'date'], ascending=[False, False]).drop(columns=['relevance'])
-
-        return sorted_rows.head(top_n)
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return pd.DataFrame(columns=self.articles_df.columns)
     
     def search_by_embedding(self, input_str: str, top_n= 15):
         input_embedding = self.get_embedding(input_str)
@@ -50,29 +65,32 @@ class JsonArticleManager(ArticleManager):
 
         return top_articles_df
 
-    def search_by_text(self, input_str: str, top_n= 15):
-        # Search the appropriate column for the input string
-        query_results = self.articles_df[self.articles_df['text'].str.contains(input_str) | \
-                                         self.articles_df['translation'].str.contains(input_str)]
+    def search_by_text(self, input_str: str, top_n=15):
+        try:
+            # Ensure the input_str is a string
+            if not isinstance(input_str, str):
+                raise ValueError("The input_str must be a string.")
 
-        # If there are no results, return an empty dataframe
-        if query_results.empty:
-            return pd.DataFrame(columns=['title', 'embedding', 'text', 'translation', 'date'])
+            # Search the appropriate columns for the input string
+            query_results = self.articles_df[
+                self.articles_df['text'].str.contains(input_str, na=False) | 
+                self.articles_df['translation'].str.contains(input_str, na=False)
+            ]
 
-        # Sort the query results by date in descending order
-        #query_results = query_results.sort_values(by='date', ascending=False)
+            # If there are no results, return an empty DataFrame
+            if query_results.empty:
+                return pd.DataFrame(columns=self.articles_df.columns)
 
-        #     # Calculate cosine similarity between the query embeddings and all embeddings in the dataframe
-        #     query_embeddings = np.stack(query_results['embedding'].to_numpy())
-        #     all_embeddings = np.stack(dataframe['embedding'].to_numpy())
-        #     similarity = cosine_similarity(all_embeddings, query_embeddings)
+            # Sort the query results by date in descending order
+            sorted_results = query_results.sort_values(by='date', ascending=False)
 
-        #     # Sort the similarities in descending order and get the top n indices
-        #     top_indices = similarity.argsort(axis=0)[::-1][:top_n].flatten()
-
-        #     # Get the top n most similar articles as a new dataframe
-        #     top_articles_df = dataframe.loc[top_indices]
-        return query_results.head(top_n)
+            return sorted_results.head(top_n)
+        except KeyError as e:
+            logger.error(f"KeyError: {e}")
+            return pd.DataFrame(columns=self.articles_df.columns)
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return pd.DataFrame(columns=self.articles_df.columns)
 
     def __count_tags__(self) -> pd.DataFrame:
         # Create an empty list to store the tag counts
