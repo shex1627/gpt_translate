@@ -72,7 +72,8 @@ class LocalFilePlaylistManager(PlaylistManager):
             audio_path = os.path.join(self.audio_files_dir, f"{prefix}{article_id}.wav")
             print(f"checking if {audio_path} exists")
             if os.path.exists(audio_path):
-                audio = AudioSegment.from_wav(audio_path)
+                #audio = AudioSegment.from_wav(audio_path)
+                audio = AudioSegment.from_mp3(audio_path)
                 playlist += audio
                 valid_article_ids.append(article_id)
             else:

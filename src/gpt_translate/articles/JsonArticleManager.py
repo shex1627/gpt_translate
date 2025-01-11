@@ -17,6 +17,10 @@ class JsonArticleManager(ArticleManager):
     def __init__(self, articles_json_path: str):
         #articles_json = load_json_files(json_data_path)
         self.articles_df = pd.read_json(articles_json_path, orient="records")
+        # convert chinese tags to dictionary if it is string
+        self.articles_df['chinese_tags'] = self.articles_df['chinese_tags'].apply(lambda x: eval(x) if isinstance(x, str) else x)
+        # convert english tags to dictionary if it is string
+        self.articles_df['english_tags'] = self.articles_df['english_tags'].apply(lambda x: eval(x) if isinstance(x, str) else x)
         self.tags_count = self.__count_tags__()
         self.article_json_path = articles_json_path
 

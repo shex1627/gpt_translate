@@ -83,7 +83,8 @@ def get_article_manager():
 
 def play_audio(file):
     audio_bytes = open(file, "rb").read()
-    st.audio(audio_bytes, format="audio/wav")
+    #st.audio(audio_bytes, format="audio/wav")
+    st.audio(audio_bytes, format="audio/mp3")
 
 def preview_articles(articles_df):
     st.write("Preview:")
