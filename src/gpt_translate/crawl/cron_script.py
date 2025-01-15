@@ -26,11 +26,13 @@ def restart_service(service_names):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run another Python script at regular intervals.")
     parser.add_argument("script_path", type=str, help="Path to the Python script to be run.")
+    parser.add_argument("python_exe", type=str, default="/opt/shichenh/miniconda3/envs/gpt_translate/bin/python", help="Path to the Python executable to use. Default is /opt/shichenh/miniconda3/envs/gpt_translate/bin/python.")
     parser.add_argument("--interval", type=int, default=60, help="Interval in seconds between script runs. Default is 60 seconds.")
     parser.add_argument("--log_level", type=str, default="INFO", help="Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL. Default is INFO.")
     parser.add_argument("--services", nargs='+', help="List of user services to restart.")
 
     args = parser.parse_args()
+    print(args)
 
     configure_logging(args.log_level)
     
@@ -38,6 +40,6 @@ if __name__ == "__main__":
         if args.services:
             restart_service(args.services)
         
-        run_script(args.script_path, args.interval)
+        run_script(args.script_path, args.interval,args.python_exe)
         logging.info(f"Sleeping for {args.interval} seconds")
         time.sleep(args.interval)

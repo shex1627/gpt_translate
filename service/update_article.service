@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/opt/shichenh/miniconda3/envs/gpt_translate/bin/python cron_script.py /opt/shichenh/gpt_translate/src/gpt_translate/crawl/article_update.py  --interval 21600 --services memory_streamlit.service ask_streamlit.service
-WorkingDirectory=/opt/shichenh/gpt_translate/src/gpt_translate/crawl
-EnvironmentFile=/opt/shichenh/gpt_translate/service/update_article.env
+ExecStart=/home/bookworm/.pyenv/versions/3.11.7/envs/gpt-translate/bin/python /home/bookworm/code/gpt_translate/src/gpt_translate/crawl/cron_script.py "/home/bookworm/code/gpt_translate/src/gpt_translate/crawl/article_update.py" "/home/bookworm/.pyenv/versions/3.11.7/envs/gpt-translate/bin/python" --interval 21600 --services memory_streamlit.service
+WorkingDirectory=/home/bookworm/code/gpt_translate/src/gpt_translate/crawl
+EnvironmentFile=/home/bookworm/code/gpt_translate/service/update_article.env
 
 [Install]
 WantedBy=default.target

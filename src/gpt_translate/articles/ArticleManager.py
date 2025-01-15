@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List
-import openai
+from openai import OpenAI
 import os
 import json
 import string
@@ -9,8 +9,7 @@ import re
 from gpt_translate.articles.dto import LanguageEnum
 from pydantic import BaseModel
 
-
-openai.api_key = os.environ["OPENAI_API_KEY"]
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 class ArticleManager:
     def __init__(self):
@@ -28,11 +27,16 @@ class ArticleManager:
     def get_embedding(self, text: str, model="text-embedding-ada-002"):
         try:
             text = text.replace("\n", " ")
-            return openai.Embedding.create(input = [text], model=model)['data'][0]['embedding']
+            embedding_response = client.embeddings.create(input = [text], model=model)
+            embedding = embedding_response.data[0].embedding
+            return embedding
         except Exception as e:
+            import traceback
+            print(f"Error in get_embedding: {e}")
+            print(traceback.format_exc())
             print(e)
             return []
-    
+
     def add_complete_article(self):
         """
         add article to current existing articles, persist
@@ -49,7 +53,7 @@ class ArticleManager:
         article should have column ID which should be unique
         """
         raise NotImplementedError()
-    
+
     def complete_article(self):
         """
         [modify DB]
@@ -65,7 +69,7 @@ class ArticleManager:
         chinese_tags
         """
         raise NotImplementedError()
-    
+
     def add_tag(self, article_id: int):
         """
         [modify DB]
@@ -89,6 +93,6 @@ class ArticleManager:
         """
         # Replace spaces with underscores in any multi-word strings
         words = [w.replace(' ', '_') if ' ' in w else w for w in tags]
-        
+
         # Concatenate the words with the specified delimiter
         return delimiter.join(words)

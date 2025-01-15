@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 import os
 import json
 import streamlit as st
@@ -20,7 +22,6 @@ from gpt_translate.article_to_translation import text_split, send_chatcomplete_a
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
 TOP_K_ARTICLES = 5
 SINGLE_ARTICLE_SUMMARY_LENGTH = 2020
@@ -61,7 +62,7 @@ def agggregate_article_summary(article_summaries: str, question: str, language: 
     aggregate_answers_msg = aggregate_article_prompt(question, article_summaries, 
                                                      word_limit = SINGLE_ARTICLE_SUMMARY_LENGTH, 
                                                      language=language)
-    response = openai.ChatCompletion.create(**completion_config, messages=aggregate_answers_msg)
+    response = client.chat.completions.create(**completion_config, messages=aggregate_answers_msg)
     return response
 
 # set up page icon
@@ -80,7 +81,7 @@ if os.environ.get('HIDE_MENU', 'true') == 'true':
             footer {visibility: hidden;}
             </style>
             """, unsafe_allow_html=True)
-        
+
 st.title("Answer Questions from Articles")
 st.write("This website uses GPT to answer questions based on the top 5 relevant articles from a wechat blog. The blog covers a wide range of common topics in life.")
 
@@ -115,8 +116,8 @@ question = st.text_input("question prompt",value=initial_question, max_chars=60)
 st.experimental_set_query_params(question=question, language=st.session_state.language)
 
 if (st.button("Ask") and question) or auto_run:
-    key_context_resp = openai.ChatCompletion.create(**completion_config, messages=key_context_prompt(question))
-    key_context = key_context_resp.choices[0]['message']['content'].replace("作者,", "")
+    key_context_resp = client.chat.completions.create(**completion_config, messages=key_context_prompt(question))
+    key_context = key_context_resp.choices[0].message.content.replace("作者,", "")
     relevant_articles = article_manager.search_by_embedding(key_context, top_n=TOP_N_ARTICLES) 
     if st.session_state.is_random == "Default":
         seed = "None"
@@ -180,10 +181,10 @@ if st.session_state.get("results", pd.DataFrame()).shape[0] > 0:
 
     st.header("Overall Summary")
     st.write("".join(overall_summary_sentences))
-    
+
     # save current output to another file 
     with open(OUTPUT_FILE_PATH, "w") as f:
         output[question_key] = {"article_summary_sentences": trunk_processed, 
                             "overall_summary_sentences": overall_summary_sentences}
         json.dump(output, f, indent=4)
-    
+

@@ -10,7 +10,7 @@ from st_aggrid import GridUpdateMode, DataReturnMode
 from gpt_translate.articles.JsonArticleManager import JsonArticleManager
 from gpt_translate.utils import add_newlines
 
-@st.cache_data
+@st.cache_resource
 def get_article_manager():
    article_manager = JsonArticleManager(os.environ.get('ARTICLE_DB_PATH', '"C:\\Users\\alistar\\Desktop\\ds\\blogger_translate\\articles_embedding.json"'))
    return article_manager
@@ -34,7 +34,7 @@ if os.environ.get('HIDE_MENU', 'true') == 'true':
 st.title("Article Search")
 
 article_manager = get_article_manager()
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 print(query_params)
 
 language = st.radio("Language:", ["English", "Chinese"], index=0)
@@ -114,7 +114,8 @@ if len(selected_rows) > 0:
         st.write(st.session_state.selected_article['translation'])
     else:
         st.code(add_newlines(st.session_state.selected_article['text'].strip()))
-    st.experimental_set_query_params(article_id=st.session_state.selected_article['id'])
+    st.query_params['article_id'] = st.session_state.selected_article['id']
+    #(article_id=st.session_state.selected_article['id'])
     
 elif len(query_selected_rows) > 0:
     st.header("Read Article")

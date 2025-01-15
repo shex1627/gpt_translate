@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/opt/shichenh/miniconda3/envs/gpt_translate/bin/python -m streamlit run app_aggrid.py --server.port 8501
-WorkingDirectory=/opt/shichenh/gpt_translate/src/streamlit_app
-EnvironmentFile=/opt/shichenh/gpt_translate/service/memory.env
+ExecStart=/home/bookworm/.pyenv/versions/3.11.7/envs/gpt-translate/bin/python -m streamlit run app_aggrid.py --server.port 8501
+WorkingDirectory=/home/bookworm/code/gpt_translate/src/streamlit_app
+EnvironmentFile=/home/bookworm/code/gpt_translate/service/memory.env
 
 [Install]
 WantedBy=default.target

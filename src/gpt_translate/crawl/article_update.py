@@ -15,11 +15,12 @@ import pandas as pd
 
 import logging
 
-LOG_FILE_PATH = "/opt/shichenh/blogger_crawl.log"
+LOG_FILE_PATH = os.environ.get("LOG_FILE_PATH", "/home/bookworm/blogger_crawl.log")
+ARTICLE_JSON_PATH = os.environ.get("ARTICLE_JSON_PATH", "/home/bookworm/code/gpt_translate/data/articles_embedding.json")
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s",
     handlers=[
         logging.FileHandler(LOG_FILE_PATH, mode='a'),
         logging.StreamHandler(sys.stdout)
@@ -27,7 +28,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("crawl netease")
 
-ARTICLE_JSON_PATH = "/opt/shichenh/articles_embedding.json"
 article_manager = JsonArticleManager(ARTICLE_JSON_PATH)
 
 
@@ -125,6 +125,9 @@ completion_config = {
     'temperature': 0
 }
 
+import json
+with open("article.json", "w") as f:
+    json.dump(records, f)
 
 for record in records:
     try:
@@ -136,7 +139,7 @@ for record in records:
         else:
             continue
     except Exception as e:
-        logger.error(f"error processing record {record['title']}")
+        logger.error(f"error processing record {record['title']}", exc_info=True)
         logger.error(e)
 
 logger.info(f"new total article size: {article_manager.articles_df.shape[0]}")

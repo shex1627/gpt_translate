@@ -2,6 +2,8 @@ import json
 import pandas as pd
 import numpy as np
 from typing import Dict
+import json
+import os
 from sklearn.metrics.pairwise import cosine_similarity
 
 from gpt_translate.articles.dto import * 

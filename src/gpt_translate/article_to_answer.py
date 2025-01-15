@@ -1,10 +1,12 @@
 import concurrent.futures
-import openai  # Make sure you've imported the required module
+from openai import OpenAI
+
+client = OpenAI()  # Make sure you've imported the required module
 from functools import partial
 
 def send_single_chatcomplete_api(message_list, chatcomplete_config):
     try:
-        response = openai.ChatCompletion.create(**chatcomplete_config, messages=message_list)
+        response = client.chat.completions.create(**chatcomplete_config, messages=message_list)
         return response
     except Exception as e:
         print(f"Error sending chatcomplete API request: {e}")

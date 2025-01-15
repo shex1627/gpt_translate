@@ -3,7 +3,9 @@ import json
 from typing import List, Callable
 import logging
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 from tqdm import tqdm
 
 logger = logging.getLogger("article translation util")
@@ -38,6 +40,16 @@ def text_split(text: str, max_length = 1024) -> List[str]:
 
     # Return the list of segments
     return segments
+
+def response_to_str(response):
+    """
+    Converts an OpenAI response to a string."""
+    try:
+        response_str = response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"error converting response to string: {e}", exc_info=True)
+        response_str = ""
+    return response_str
 
 def combine_openapi_response(response):
     """
@@ -95,7 +107,7 @@ def send_chatcomplete_api(message_chunk, chatcomplete_config):
     with tqdm(total=len(message_chunk), desc="Sending chatcomplete API requests") as pbar:
         for message_list in message_chunk:
             try:
-                response = openai.ChatCompletion.create(**chatcomplete_config, messages=message_list)
+                response = client.chat.completions.create(**chatcomplete_config, messages=message_list)
                 responses.append(response)
             except Exception as e:
                 print(f"Error sending chatcomplete API request: {e}")
@@ -123,7 +135,8 @@ def translate_article(article_text: str, completion_config: dict, messages_gener
     print(f"there are {len(text_trunks)} text_trunks")
     trunk_messages = [messages_generator(text_trunk) for text_trunk in text_trunks]
     responses = send_chatcomplete_api(trunk_messages, completion_config)
-    trunk_translations = [combine_openapi_response(response)[0] for response in responses]
+    #trunk_translations = [combine_openapi_response(response)[0] for response in responses]
+    trunk_translations = [response_to_str(response) for response in responses]
     article_translation = "\n".join(trunk_translations)
     return article_translation
 
@@ -145,6 +158,6 @@ def process_article(article_text: str, text_chunk_size: int, completion_config: 
     text_trunks = text_split(article_text, max_length=text_chunk_size)
     trunk_messages = [messages_generator(text_trunk) for text_trunk in text_trunks]
     responses = send_chatcomplete_api(trunk_messages, completion_config)
-    trunk_processed = [combine_openapi_response(response)[0] for response in responses]
+    trunk_processed = [response_to_str(response) for response in responses]
     article_processed = "\n".join(trunk_processed)
     return article_processed 

@@ -1,10 +1,10 @@
 [Unit]
 Description=Cloudflared Tunnel
-After=memory_streamlit.service
+After=network.target
 
 [Service]
 Type=simple
-ExecStart=cloudflared tunnel --config /opt/shichenh/.cloudflared/config.yml run
+ExecStart=cloudflared tunnel --config /home/bookworm/.cloudflared/config.yml run
 Restart=always
 RestartSec=3
 
