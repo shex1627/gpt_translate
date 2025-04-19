@@ -92,7 +92,10 @@ if new_articles_df.shape[0]:
 
             # Find all elements with the specified class
 
-            content_div = soup.find("section", class_="article-body js-article-body")
+            #content_div = soup.find("section", class_="article-body js-article-body")
+            content_div = soup.find("article", class_="article js-article")
+            if content_div is None:
+                content_div = soup.find("div", class_="article-body")
             element_text = content_div.get_text()
             reformmated_text = element_text.replace("。", "\n")
             

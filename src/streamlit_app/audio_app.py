@@ -10,7 +10,7 @@ from streamlit_app.utils import get_article_manager, play_audio, preview_article
 
 # Configure the logging system
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s [%(levelname)s] - %(message)s',
     handlers=[
         logging.FileHandler("streamlit_app.log"),
@@ -79,7 +79,7 @@ else:
     show_cols = ['title', 'chinese_main_topic', 'chinese_tags']
 
 # Play Articles Playlist
-playlist_id = st.experimental_get_query_params().get("playlist_id", None)
+playlist_id = st.query_params.get("playlist_id", None)
 logger.info(f"query_params: playlist_id: {playlist_id}")
 # parse playlist_id, throw error if not int
 try:
@@ -125,7 +125,7 @@ if st.session_state['random_articles'].shape[0] > 0:
         valid_article_ids = random_articles[random_articles['audio_exist']]['id'].tolist()
         playlist_id = playlist_manager.generate_playlist_from_ids(valid_article_ids, lang)
         logger.info(f"generated playlist_id: {playlist_id}")
-        st.experimental_set_query_params(playlist_id=[playlist_id])
+        st.query_params['playlist_id'] = [playlist_id]
         st.session_state['playlist_id'] = playlist_id
         logger.info(f"set session_state['playlist_id'] to {playlist_id}")
         #st.experimental_rerun() 
@@ -147,7 +147,7 @@ if st.session_state['embedding_articles'].shape[0] > 0:
     if st.button("Confirm Search Playlist", key='confirm_search'):
         valid_article_ids = st.session_state['embedding_articles'][st.session_state['embedding_articles']['audio_exist']]['id'].tolist()
         playlist_id = playlist_manager.generate_playlist_from_ids(valid_article_ids, lang)
-        st.experimental_set_query_params(playlist_id=[playlist_id])
+        st.query_params['playlist_id'] = [playlist_id]
         st.session_state['playlist_id'] = playlist_id
         #st.experimental_rerun() 
 
@@ -175,7 +175,7 @@ if st.session_state['input_articles'].shape[0] > 0:
     if st.button("Confirm ID Playlist", key='confirm_ids'):
         valid_article_ids = st.session_state['input_articles'][st.session_state['input_articles']['audio_exist']]['id'].tolist()
         playlist_id = playlist_manager.generate_playlist_from_ids(valid_article_ids, lang)
-        st.experimental_set_query_params(playlist_id=[playlist_id])
+        st.query_params['playlist_id'] = [playlist_id]
         st.session_state['playlist_id'] = playlist_id
         #st.experimental_rerun() 
 
